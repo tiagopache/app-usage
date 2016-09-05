@@ -1,6 +1,7 @@
 ﻿using AppUsage.Infrastructure.Data.Base;
 using AppUsage.Infrastructure.Data.Contexts;
 using AppUsage.Infrastructure.Data.Repositories;
+using AppUsage.Infrastructure.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -8,21 +9,31 @@ namespace AppUsage.Infrastructure.Data
 {
     public class UnitOfWork : IUnitOfWork
     {
+        private static int _instanceSequence = 0;
+
         //[Dependency]
         internal IDbContext _context { get; set; }
 
         public UnitOfWork(IDbContext context)
         {
+            _instanceSequence++;
+
+            UnityEventLogger.Log.CreateUnityMessage($"{this.GetType().ToString()} {_instanceSequence}");
+
             this._context = context;
         }
 
         public void Save()
         {
+            UnityEventLogger.Log.LogUnityMessage($"{this.GetType().ToString()} {_instanceSequence} - Save");
+
             _context.SaveChanges();
         }
 
         public async Task<int> SaveAsync()
         {
+            UnityEventLogger.Log.LogUnityMessage($"{this.GetType().ToString()} {_instanceSequence} - SaveAsync");
+
             return await _context.SaveChangesAsync();
         }
 
@@ -30,10 +41,16 @@ namespace AppUsage.Infrastructure.Data
 
         protected virtual void Dispose(bool disposing)
         {
+            UnityEventLogger.Log.LogUnityMessage($"Disposing {this.GetType().ToString()} {_instanceSequence}");
+
             if (!_disposedValue)
             {
                 if (disposing)
                     _context.Dispose();
+
+                UnityEventLogger.Log.DisposeUnityMessage($"{this.GetType().ToString()} {_instanceSequence}");
+
+                _instanceSequence--;
 
                 _disposedValue = true;
             }

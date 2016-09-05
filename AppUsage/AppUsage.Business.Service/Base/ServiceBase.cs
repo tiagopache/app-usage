@@ -1,6 +1,7 @@
 ﻿using AppUsage.Infrastructure.Data;
 using AppUsage.Infrastructure.Data.Base;
 using AppUsage.Infrastructure.Extensions;
+using AppUsage.Infrastructure.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,17 @@ using System.Linq.Expressions;
 
 namespace AppUsage.Business.Service.Base
 {
-    public abstract class ServiceBase<TEntity> where TEntity : BaseEntity
+    public abstract class ServiceBase<TEntity> where TEntity : BaseEntity, IDisposable
     {
+        private static int _instanceSequence = 0;
+        private bool disposed = true;
+
         public ServiceBase(IUnitOfWork<TEntity> uow)
         {
+            _instanceSequence++;
+
+            UnityEventLogger.Log.CreateUnityMessage($"{this.GetType().ToString()} {_instanceSequence}");
+
             this.unitOfWork = uow;
         }
 
@@ -48,6 +56,31 @@ namespace AppUsage.Business.Service.Base
             this.unitOfWork.Save();
 
             return toSave;
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            UnityEventLogger.Log.LogUnityMessage($"Disposing {this.GetType().ToString()} {_instanceSequence}");
+
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    // do the dispose of other objects here
+                }
+
+                UnityEventLogger.Log.DisposeUnityMessage($"{this.GetType().ToString()} {_instanceSequence}");
+
+                _instanceSequence--;
+
+                this.disposed = true;
+            }
         }
     }
 }
