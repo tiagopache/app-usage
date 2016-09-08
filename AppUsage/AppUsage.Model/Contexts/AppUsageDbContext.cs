@@ -7,21 +7,6 @@ using System.Diagnostics;
 
 namespace AppUsage.Model.Contexts
 {
-    //public class AppUsageDbContextFactory : IDbContextFactory<AppUsageDbContext>
-    //{
-    //    private AppUsageDbContext _context { get; set; }
-
-    //    public AppUsageDbContextFactory(AppUsageDbContext context)
-    //    {
-    //        this._context = context;
-    //    }
-
-    //    public AppUsageDbContext Create()
-    //    {
-    //        return this._context;
-    //    }
-    //}
-
     public class AppUsageDbContext : DbContext, IDbContext
     {
         public IDbSet<Device> Devices { get; set; }
