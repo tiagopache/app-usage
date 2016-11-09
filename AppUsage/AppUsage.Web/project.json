@@ -28,7 +28,9 @@
     "emitEntryPoint": true,
     "preserveCompilationContext": true
   },
-
+  "runtimes": {
+    "win": {}
+  },
   "runtimeOptions": {
     "configProperties": {
       "System.GC.Server": true
